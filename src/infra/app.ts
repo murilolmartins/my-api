@@ -1,10 +1,16 @@
-import type { FastifyReply, FastifyRequest } from 'fastify';
 import fastify from 'fastify';
+import {
+  serializerCompiler,
+  validatorCompiler,
+} from 'fastify-type-provider-zod';
+
+import { AppRoutes } from './routes';
 
 const app = fastify();
 
-app.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
-  return reply.send({ hello: 'world' });
-});
+app.setValidatorCompiler(validatorCompiler);
+app.setSerializerCompiler(serializerCompiler);
+
+AppRoutes(app);
 
 export { app };
