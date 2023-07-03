@@ -1,10 +1,16 @@
 import type { z } from 'zod';
 
-export const zodSchemaValidationErrorParse = (error: z.ZodError) => {
+import type { FastifyResponse } from '../types';
+
+export const zodSchemaValidationErrorParse = (
+  error: z.ZodError,
+): FastifyResponse<null> => {
   const errorResponse = {
     statusCode: 400,
-    message: 'Bad Request',
-    errors: error.errors,
+    errors: error.errors.map((error) => ({
+      code: error.code.toUpperCase(),
+      message: error.message,
+    })),
     data: null,
   };
 

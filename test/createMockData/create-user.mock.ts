@@ -8,7 +8,7 @@ export const createUserMock = (
     name: faker.person.fullName(),
     email: faker.internet.email(),
     password: faker.internet.password(),
-    birthDate: faker.date.past(),
+    birthdate: faker.date.past(),
     ...userData,
   };
 

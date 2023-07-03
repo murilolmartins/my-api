@@ -4,28 +4,35 @@ module.exports = {
     node: true,
   },
 
-  parser: "@typescript-eslint/parser",
+  parser: '@typescript-eslint/parser',
 
   parserOptions: {
-    ecmaVersion: "latest",
-    sourceType: "module",
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: './tsconfig.json',
   },
 
-  plugins: ["@typescript-eslint", "eslint-plugin-import-helpers"],
+  plugins: ['@typescript-eslint', 'eslint-plugin-import-helpers'],
 
-  extends: ["standard", "plugin:prettier/recommended"],
+  extends: ['standard-with-typescript', "plugin:prettier/recommended"],
+
+  ignorePatterns: ['.eslintrc.js'],
 
   rules: {
-    "no-undef": "off",
-    "no-useless-constructor": "off",
-    "@typescript-eslint/consistent-type-imports": "error",
-    "import-helpers/order-imports": [
-      "error",
+    'no-undef': 'off',
+    'no-useless-constructor': 'off',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/consistent-type-imports': 'error',
+    '@typescript-eslint/strict-boolean-expressions': 'off',
+    "@typescript-eslint/return-await": "off",
+    "no-console": "warn",
+    'import-helpers/order-imports': [
+      'error',
       {
-        newlinesBetween: "always",
-        groups: ["absolute", "module", "/^@/", "index"],
+        newlinesBetween: 'always',
+        groups: ['absolute', 'module', '/^@/', 'index'],
         alphabetize: {
-          order: "asc",
+          order: 'asc',
           ignoreCase: true,
         },
       },

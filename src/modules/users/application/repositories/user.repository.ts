@@ -1,8 +1,9 @@
-import type { UserEntity } from '../../domain/entities';
-import type { CreateUserType } from '../../domain/schemas/create-user.schema';
+import { type User } from '@prisma/client';
 
-export type UserRepository = {
-  create(userData: CreateUserType): Promise<UserEntity>;
-  findAll(): Promise<UserEntity[] | []>;
-  findByEmail(email: string): Promise<UserEntity | undefined>;
-};
+import { type UserEntity } from '../../domain/entities';
+
+export interface UserRepository {
+  create: (userData: UserEntity) => Promise<User | UserEntity>;
+  findAll: () => Promise<User[] | UserEntity[] | []>;
+  findByEmail: (email: string) => Promise<User | UserEntity | null>;
+}

@@ -1,6 +1,10 @@
-export type FastifyResponse<T> = {
-  statusCode: number;
+interface Error {
+  code: string;
   message: string;
+}
+
+export interface FastifyResponse<T> {
+  statusCode: number;
   data: T | null;
-  errors: string[] | null;
-};
+  errors: Error[] | null;
+}
