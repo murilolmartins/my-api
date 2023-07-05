@@ -5,10 +5,13 @@ import {
 } from 'fastify';
 import { type ZodTypeProvider } from 'fastify-type-provider-zod';
 
-import { UserMapper } from '../../application/mappers';
-import { CreateUserUseCase } from '../../application/usecases';
+import { type FastifyResponse } from '@/core';
+import { type User } from '@prisma/client';
+
+import { UserController } from '../../application/controllers/user.contoller';
 import { type CreateUserType, createUserSchema } from '../../domain/schemas';
-import { UserPrismaRepository } from '../repositories/prisma/userPrisma.repository';
+
+export type CreateUserResponse = Omit<User, 'password'>;
 
 export const createUserRoute = (app: FastifyInstance): void => {
   app.withTypeProvider<ZodTypeProvider>().route({
@@ -20,17 +23,7 @@ export const createUserRoute = (app: FastifyInstance): void => {
     handler: async (
       request: FastifyRequest<{ Body: CreateUserType }>,
       reply: FastifyReply,
-    ) => {
-      const createUserUseCase = new CreateUserUseCase(
-        new UserPrismaRepository(app.prisma),
-        new UserMapper(),
-      );
-
-      const createUserReturn = await createUserUseCase.execute(request.body);
-
-      reply.statusCode = createUserReturn.statusCode;
-
-      return reply.send(createUserReturn);
-    },
+    ): Promise<FastifyResponse<CreateUserResponse>> =>
+      await new UserController().create(request, reply),
   });
 };

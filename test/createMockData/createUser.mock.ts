@@ -1,4 +1,4 @@
-import type { CreateUserType } from '@/modules/users/domain/schemas/create-user.schema';
+import type { CreateUserType } from '@/modules/users/domain/schemas/createUser.schema';
 import { faker } from '@faker-js/faker';
 
 export const createUserMock = (

@@ -1,12 +1,12 @@
-import { app } from './app';
+import { buildApp } from './app';
 import { envVars } from './env';
 import prisma from './prisma';
 
-app.decorate('prisma', prisma);
-
 async function start(): Promise<void> {
+  const app = await buildApp(prisma);
   app.listen({ port: envVars.API_PORT, host: '0.0.0.0' }, (err, address) => {
-    if (!err) {
+    if (err) {
+      app.log.error(err);
       process.exit(1);
     }
   });

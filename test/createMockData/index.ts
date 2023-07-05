@@ -1,1 +1,1 @@
-export * from './create-user.mock';
+export * from './createUser.mock';

@@ -29,10 +29,19 @@ describe('CreateUserUseCase', () => {
     const createUserReturn = await createUserUseCase.execute(userData);
     const users = await userRepository.findAll();
 
-    expect(createUserReturn.errors).toBe(null);
-    expect(createUserReturn.data).toHaveProperty('id');
+    expect(createUserReturn.value.errors).toBe(null);
+    expect(createUserReturn.value.data).toHaveProperty('id');
     expect(users).toHaveLength(1);
-    expect(users[0]).toEqual(createUserReturn.data);
+    expect(users[0]).toEqual({
+      id: expect.any(String),
+      name: userData.name,
+      email: userData.email,
+      birthdate: userData.birthdate,
+      age: 0,
+      password: expect.any(String),
+      createdAt: new Date('2023-07-03 00:00:00'),
+      updatedAt: new Date('2023-07-03 00:00:00'),
+    });
   });
 
   it('should not create a new user with an existent email', async () => {
@@ -45,14 +54,14 @@ describe('CreateUserUseCase', () => {
     await createUserUseCase.execute(users[0]);
     const createUserReturn = await createUserUseCase.execute(users[1]);
 
-    expect(createUserReturn.errors).toEqual([
+    expect(createUserReturn.value.errors).toEqual([
       {
         message: 'User already exists',
         code: UserErrors.USER_ALREADY_EXISTS,
       },
     ]);
-    expect(createUserReturn.statusCode).toBe(409);
-    expect(createUserReturn.data).toBe(null);
+    expect(createUserReturn.value.statusCode).toBe(409);
+    expect(createUserReturn.value.data).toBe(null);
   });
 
   it('should create a user with encrypt the password', async () => {
@@ -61,9 +70,9 @@ describe('CreateUserUseCase', () => {
     const createUserReturn = await createUserUseCase.execute(userData);
     const users = await userRepository.findAll();
 
-    expect(createUserReturn.errors).toBe(null);
+    expect(createUserReturn.value.errors).toBe(null);
     expect(users).toHaveLength(1);
     expect(users[0].password).not.toBe(userData.password);
-    expect(createUserReturn.data).not.toHaveProperty('password');
+    expect(createUserReturn.value.data).not.toHaveProperty('password');
   });
 });

@@ -1,4 +1,4 @@
-import fastify from 'fastify';
+import fastify, { type FastifyInstance } from 'fastify';
 import {
   serializerCompiler,
   validatorCompiler,
@@ -6,29 +6,55 @@ import {
 import { z } from 'zod';
 
 import { zodSchemaValidationErrorParse } from '@/core';
+import { AppError } from '@/core/errors/app.error';
+import { Prisma, type PrismaClient } from '@prisma/client';
 
+import { envVars } from './env';
 import { AppRoutes } from './routes';
 
-const app = fastify({
-  logger: {
-    transport: {
-      target: 'pino-pretty',
-    },
-  },
-});
+const buildApp = async (prisma: PrismaClient): Promise<FastifyInstance> => {
+  const app = fastify({
+    logger:
+      envVars.NODE_ENV === 'development'
+        ? {
+            transport: {
+              target: 'pino-pretty',
+            },
+          }
+        : false,
+  });
 
-app.setValidatorCompiler(validatorCompiler);
-app.setSerializerCompiler(serializerCompiler);
+  app.addHook('onRequest', async (req) => {
+    req.prisma = prisma;
+  });
 
-app.setErrorHandler(function (error, _, reply) {
-  if (error instanceof z.ZodError) {
-    reply.statusCode = 400;
+  app.setValidatorCompiler(validatorCompiler);
+  app.setSerializerCompiler(serializerCompiler);
 
-    return zodSchemaValidationErrorParse(error);
-  }
-  return error;
-});
+  app.setErrorHandler(function (error, _, reply) {
+    if (error instanceof z.ZodError) {
+      reply.statusCode = 400;
 
-void AppRoutes(app);
+      return zodSchemaValidationErrorParse(error);
+    }
 
-export { app };
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      app.log.fatal(error.code, error.message);
+      return new AppError(500, [
+        { code: 'INTERNAL_SERVER_ERROR', message: 'Internal server error' },
+      ]);
+    }
+
+    return error;
+  });
+
+  app.get('/healthcheck', async () => {
+    return { status: 'ok' };
+  });
+
+  await AppRoutes(app);
+
+  return app;
+};
+
+export { buildApp };

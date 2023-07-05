@@ -1,6 +1,8 @@
 import { type UserRepository } from '@/modules/users/application/repositories';
 import { type CreateUserType } from '@/modules/users/domain/schemas';
-import { type PrismaClient, type User } from '@prisma/client';
+import { type PrismaClient, type Prisma, type User } from '@prisma/client';
+
+export type UserP = Prisma.UserGetPayload<true>;
 
 export class UserPrismaRepository implements UserRepository {
   constructor(private readonly prisma: PrismaClient) {}

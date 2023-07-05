@@ -1,18 +1,16 @@
+import { StatusCodes } from 'http-status-codes';
 import type { z } from 'zod';
 
-import type { FastifyResponse } from '../types';
+import { AppError } from '../errors/app.error';
 
-export const zodSchemaValidationErrorParse = (
-  error: z.ZodError,
-): FastifyResponse<null> => {
+export const zodSchemaValidationErrorParse = (error: z.ZodError): AppError => {
   const errorResponse = {
-    statusCode: 400,
+    statusCode: StatusCodes.BAD_REQUEST,
     errors: error.errors.map((error) => ({
       code: error.code.toUpperCase(),
       message: error.message,
     })),
-    data: null,
   };
 
-  return errorResponse;
+  return new AppError(errorResponse.statusCode, errorResponse.errors);
 };
